@@ -2,6 +2,8 @@ import { useState, useEffect, ChangeEvent } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { fetchTweet } from './utils/twitter'
 import { API_BASE_URL } from './utils/config'
+import { useSupabase } from './hooks/useSupabase'
+import { Login } from './components/Login'
 import { 
   PencilSquareIcon, 
   TrashIcon,
@@ -16,30 +18,6 @@ const XIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
   </svg>
 );
-
-// Create a custom hook for Supabase
-const useSupabase = () => {
-  const [supabase] = useState(() => 
-    createClient(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY
-    )
-  );
-
-  useEffect(() => {
-    // Test Supabase connection
-    supabase.from('saved_tweets').select('count', { count: 'exact', head: true })
-      .then(({ error }) => {
-        if (error) {
-          console.error('Supabase connection error:', error)
-        } else {
-          console.log('Supabase connected successfully')
-        }
-      })
-  }, [supabase]);
-
-  return supabase;
-}
 
 interface SavedContent {
   id?: number
@@ -224,6 +202,7 @@ const RightSidebar = ({
 }
 
 function App() {
+  const { supabase, user } = useSupabase()
   const [inputType, setInputType] = useState<'text' | 'pdf' | 'tweet'>('text')
   const [outputType, setOutputType] = useState<'tweets' | 'blog'>('tweets')
   const [inputText, setInputText] = useState('')
@@ -234,13 +213,6 @@ function App() {
   const [editingItemId, setEditingItemId] = useState<number | null>(null)
   const [editingContent, setEditingContent] = useState('')
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true)
-
-  const supabase = useSupabase()
-
-  const handleTweet = (content: string) => {
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(content)}`;
-    window.open(twitterUrl, '_blank');
-  };
 
   // Fetch saved items on component mount
   useEffect(() => {
@@ -429,13 +401,31 @@ function App() {
     }
   }
 
+  const handleTweet = (content: string) => {
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(content)}`;
+    window.open(twitterUrl, '_blank');
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+  }
+
+  if (!user) {
+    return <Login />
+  }
+
   return (
     <div className="min-h-screen bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-8">
-          <div className="text-center">
+          <div className="flex justify-between items-center">
             <h1 className="text-4xl font-bold text-white">Content Remixer</h1>
-            <p className="mt-2 text-lg text-gray-300">Transform your content into tweets or blog posts</p>
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
+            >
+              Sign Out
+            </button>
           </div>
 
           <div className="bg-gray-800 rounded-xl shadow-lg p-6 space-y-6">
