@@ -20,6 +20,10 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@babel/preset-react": "^7.23.3",
+    "@babel/preset-typescript": "^7.23.3",
     "@eslint/js": "^9.17.0",
     "@rollup/rollup-linux-x64-gnu": "4.9.5",
     "@tailwindcss/typography": "^0.5.10",
@@ -29,7 +33,7 @@
     "@types/pdf-parse": "^1.1.4",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "@vitejs/plugin-react-swc": "^3.5.0",
+    "@vitejs/plugin-react": "^4.2.1",
     "@vitest/coverage-v8": "^1.2.2",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.17.0",
