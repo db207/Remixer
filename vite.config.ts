@@ -11,6 +11,15 @@ export default defineConfig({
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true
+    },
+    rollupOptions: {
+      external: ['@rollup/rollup-linux-x64-gnu'],
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          utils: ['@heroicons/react', '@supabase/supabase-js']
+        }
+      }
     }
   }
 })
