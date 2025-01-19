@@ -6,7 +6,7 @@ export function Login() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const supabase = useSupabase()
+  const { supabase } = useSupabase()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
