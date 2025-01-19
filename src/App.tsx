@@ -1,6 +1,5 @@
 import { useState, useEffect, ChangeEvent } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { generateTweetsPrompt, generateBlogPostPrompt } from './prompts'
 import { fetchTweet } from './utils/twitter'
 import { API_BASE_URL } from './utils/config'
 import { 
@@ -232,7 +231,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [savedItems, setSavedItems] = useState<SavedContent[]>([])
   const [isSaving, setIsSaving] = useState(false)
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true)
   const [editingItemId, setEditingItemId] = useState<number | null>(null)
   const [editingContent, setEditingContent] = useState('')
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true)
