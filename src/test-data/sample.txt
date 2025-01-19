@@ -1,0 +1,12 @@
+Sample Blog Post
+
+This is a sample blog post that we'll use for testing our PDF parsing functionality.
+
+Key Points:
+1. Testing PDF upload
+2. Testing content extraction
+3. Verifying text formatting
+
+The content should be properly extracted and maintained when processed through our application.
+
+This is just a simple example, but in real usage, the PDF files might contain more complex formatting, tables, and other elements that need to be handled appropriately. 
