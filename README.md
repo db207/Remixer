@@ -34,20 +34,16 @@ A powerful content remixing tool that transforms your content into different for
 
 ## Environment Setup
 
-Create two environment files:
+Create a `.env` file with the following variables:
 
-1. Frontend environment (`.env`):
 ```env
+# Frontend
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_API_URL=your_backend_url # Only needed in production
-```
 
-2. Backend environment (`.env` in root directory):
-```env
+# Backend (Vercel Serverless Functions)
 ANTHROPIC_API_KEY=your_claude_api_key
 TWITTER_BEARER_TOKEN=your_twitter_bearer_token
-PORT=3001 # Optional, defaults to 3001
 ```
 
 ## Development
@@ -62,28 +58,64 @@ npm install
 npm run dev
 ```
 
-This will start both the Vite development server and the Express backend server.
-
 ## Deployment
 
-### Frontend (Vercel)
+This project is configured for deployment on Vercel, which will handle both the frontend and backend (serverless functions).
 
-1. Fork/push this repository to GitHub
-2. Connect your repository to Vercel
-3. Add the following environment variables in Vercel:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_API_URL` (your backend URL once deployed)
+1. Push your code to GitHub:
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin YOUR_GITHUB_REPO_URL
+git push -u origin main
+```
 
-### Backend (Railway)
+2. Deploy to Vercel:
+   1. Go to https://vercel.com and sign in with GitHub
+   2. Click "Add New Project"
+   3. Import your GitHub repository
+   4. Add the following environment variables:
+      - `VITE_SUPABASE_URL`
+      - `VITE_SUPABASE_ANON_KEY`
+      - `ANTHROPIC_API_KEY`
+      - `TWITTER_BEARER_TOKEN`
+   5. Click "Deploy"
 
-1. Create a new project in Railway
-2. Connect your GitHub repository
-3. Add the following environment variables:
-   - `ANTHROPIC_API_KEY`
-   - `TWITTER_BEARER_TOKEN`
-4. Railway will automatically detect the Express server and deploy it
-5. Copy the generated Railway URL and set it as `VITE_API_URL` in your Vercel frontend deployment
+3. Set up Supabase:
+   1. Create a new project at https://supabase.com
+   2. Go to Project Settings > Database
+   3. Copy your database connection info:
+      - Project URL → `VITE_SUPABASE_URL`
+      - Project API keys > anon/public → `VITE_SUPABASE_ANON_KEY`
+   4. Go to the SQL editor and run the following migration:
+   ```sql
+   -- Create saved_tweets table
+   CREATE TABLE IF NOT EXISTS saved_tweets (
+       id BIGSERIAL PRIMARY KEY,
+       content TEXT NOT NULL,
+       title TEXT,
+       is_thread BOOLEAN DEFAULT false,
+       thread_position INTEGER,
+       created_at TIMESTAMPTZ DEFAULT NOW(),
+       updated_at TIMESTAMPTZ DEFAULT NOW()
+   );
+
+   -- Create updated_at trigger
+   CREATE OR REPLACE FUNCTION update_updated_at_column()
+   RETURNS TRIGGER AS $$
+   BEGIN
+       NEW.updated_at = NOW();
+       RETURN NEW;
+   END;
+   $$ language 'plpgsql';
+
+   CREATE TRIGGER update_saved_tweets_updated_at
+       BEFORE UPDATE ON saved_tweets
+       FOR EACH ROW
+       EXECUTE FUNCTION update_updated_at_column();
+   ```
 
 ## Future Enhancements
 
